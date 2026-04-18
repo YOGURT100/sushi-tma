@@ -45,7 +45,7 @@ async def cmd_start(message: Message):
     )
     kb.button(
         text="📞 Связаться с нами",
-        url="https://t.me/your_support",
+        url="https://t.me/@keosOG",
     )
     kb.adjust(1)
 
