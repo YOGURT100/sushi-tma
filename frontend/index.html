@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Sushi House</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🍣</span>
+        <div>
+          <div class="logo-title">Sushi House</div>
+          <div class="logo-sub">Свежие роллы с доставкой</div>
+        </div>
+      </div>
+      <button class="cart-btn" id="cart-toggle-btn" onclick="toggleCart()">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-badge" id="cart-badge">0</span>
+      </button>
+    </div>
+
+    <!-- Categories -->
+    <div class="categories" id="categories">
+      <button class="cat-btn active" onclick="filterCategory('all', this)">Все</button>
+      <button class="cat-btn" onclick="filterCategory('rolls', this)">Роллы</button>
+      <button class="cat-btn" onclick="filterCategory('nigiri', this)">Нигири</button>
+      <button class="cat-btn" onclick="filterCategory('sashimi', this)">Сашими</button>
+      <button class="cat-btn" onclick="filterCategory('sets', this)">Сеты</button>
+      <button class="cat-btn" onclick="filterCategory('drinks', this)">Напитки</button>
+    </div>
+  </header>
+
+  <!-- MENU -->
+  <main class="main" id="menu-view">
+    <div class="menu-grid" id="menu-grid"></div>
+  </main>
+
+  <!-- CART PANEL -->
+  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+  <div class="cart-panel" id="cart-panel">
+    <div class="cart-header">
+      <h2 class="cart-title">Ваш заказ</h2>
+      <button class="cart-close" onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cart-items">
+      <div class="cart-empty" id="cart-empty">
+        <div class="empty-icon">🍱</div>
+        <p>Корзина пуста</p>
+        <span>Добавьте что-нибудь из меню</span>
+      </div>
+    </div>
+    <div class="cart-footer" id="cart-footer" style="display:none">
+      <div class="promo-row">
+        <input class="promo-input" id="promo-input" type="text" placeholder="Промокод" />
+        <button class="promo-btn" onclick="applyPromo()">Применить</button>
+      </div>
+      <div class="cart-summary">
+        <div class="summary-row">
+          <span>Сумма</span>
+          <span id="subtotal">0 ₽</span>
+        </div>
+        <div class="summary-row" id="discount-row" style="display:none; color: var(--green)">
+          <span>Скидка</span>
+          <span id="discount-val">0 ₽</span>
+        </div>
+        <div class="summary-row">
+          <span>Доставка</span>
+          <span id="delivery-cost">199 ₽</span>
+        </div>
+        <div class="summary-row total-row">
+          <span>Итого</span>
+          <span id="total-price">0 ₽</span>
+        </div>
+      </div>
+      <button class="order-btn" id="order-btn" onclick="placeOrder()">
+        Оформить заказ
+      </button>
+    </div>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="success-screen" style="display:none">
+    <div class="success-content">
+      <div class="success-icon">🎉</div>
+      <h2>Заказ принят!</h2>
+      <p>Ваш заказ уже готовится.<br>Ожидайте доставку ~40 минут.</p>
+      <button class="back-btn" onclick="resetOrder()">Сделать новый заказ</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
