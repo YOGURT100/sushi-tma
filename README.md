@@ -39,7 +39,7 @@ sushi-tma/
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin https://github.com/ВАШ_ЛОГИН/sushi-tma.git
+git remote add origin https://github.com/YOGURT100/sushi-tma.git
 git push -u origin main
 ```
 
