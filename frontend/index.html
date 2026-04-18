@@ -41,7 +41,7 @@
     <div class="menu-grid" id="menu-grid"></div>
   </main>
 
-  <!-- CART PANEL -->
+  <!-- ─── CART ─────────────────────────────────────────── -->
   <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
   <div class="cart-panel" id="cart-panel">
     <div class="cart-header">
@@ -78,18 +78,127 @@
           <span id="total-price">0 ₽</span>
         </div>
       </div>
-      <button class="order-btn" id="order-btn" onclick="placeOrder()">
-        Оформить заказ
+      <button class="order-btn" id="order-btn" onclick="openCheckout()">
+        Перейти к оформлению →
       </button>
     </div>
   </div>
 
-  <!-- SUCCESS SCREEN -->
+  <!-- ─── CHECKOUT PANEL ───────────────────────────────── -->
+  <div class="checkout-panel" id="checkout-panel">
+
+    <div class="checkout-head">
+      <button class="back-icon-btn" onclick="closeCheckout()">←</button>
+      <h2 class="cart-title">Оформление заказа</h2>
+      <div style="width:36px"></div>
+    </div>
+
+    <div class="checkout-body">
+
+      <!-- Адрес -->
+      <div class="co-section">
+        <div class="co-section-title">📍 Адрес доставки</div>
+        <input
+          class="co-input"
+          id="address-street"
+          type="text"
+          placeholder="Улица и номер дома *"
+          autocomplete="street-address"
+        />
+        <input
+          class="co-input mt8"
+          id="address-apt"
+          type="text"
+          placeholder="Квартира / офис (необязательно)"
+        />
+        <input
+          class="co-input mt8"
+          id="address-comment"
+          type="text"
+          placeholder="Код домофона, комментарий курьеру"
+        />
+      </div>
+
+      <!-- Способ оплаты -->
+      <div class="co-section">
+        <div class="co-section-title">💳 Способ оплаты</div>
+        <div class="pay-list">
+
+          <label class="pay-item">
+            <input type="radio" name="payment" value="stars" checked />
+            <div class="pay-item-icon">⭐</div>
+            <div class="pay-item-info">
+              <div class="pay-item-name">Telegram Stars</div>
+              <div class="pay-item-sub">Мгновенная оплата в боте</div>
+            </div>
+            <div class="pay-item-badge pay-available">Доступно</div>
+          </label>
+
+          <label class="pay-item">
+            <input type="radio" name="payment" value="cash" />
+            <div class="pay-item-icon">💵</div>
+            <div class="pay-item-info">
+              <div class="pay-item-name">Наличные</div>
+              <div class="pay-item-sub">Оплата курьеру при получении</div>
+            </div>
+            <div class="pay-item-badge pay-available">Доступно</div>
+          </label>
+
+          <label class="pay-item pay-item--disabled">
+            <input type="radio" name="payment" value="sbp" disabled />
+            <div class="pay-item-icon">🏦</div>
+            <div class="pay-item-info">
+              <div class="pay-item-name">СБП</div>
+              <div class="pay-item-sub">Система быстрых платежей</div>
+            </div>
+            <div class="pay-item-badge pay-soon">Скоро</div>
+          </label>
+
+          <label class="pay-item pay-item--disabled">
+            <input type="radio" name="payment" value="card" disabled />
+            <div class="pay-item-icon">💳</div>
+            <div class="pay-item-info">
+              <div class="pay-item-name">Банковская карта</div>
+              <div class="pay-item-sub">Visa / Mastercard / МИР</div>
+            </div>
+            <div class="pay-item-badge pay-soon">Скоро</div>
+          </label>
+
+        </div>
+
+        <!-- Подсказка Stars -->
+        <div class="stars-hint-row" id="stars-hint-row">
+          <span>К оплате Stars:</span>
+          <span id="stars-hint">≈ — ⭐</span>
+        </div>
+      </div>
+
+      <!-- Состав заказа -->
+      <div class="co-section">
+        <div class="co-section-title">🧾 Состав заказа</div>
+        <div id="checkout-order-summary" class="co-summary"></div>
+      </div>
+
+    </div><!-- /checkout-body -->
+
+    <div class="checkout-footer">
+      <div class="co-total-row">
+        <span>Итого к оплате</span>
+        <span id="checkout-total">0 ₽</span>
+      </div>
+      <button class="order-btn" onclick="submitOrder()">
+        Подтвердить заказ ✓
+      </button>
+    </div>
+
+  </div><!-- /checkout-panel -->
+
+  <!-- ─── SUCCESS SCREEN ───────────────────────────────── -->
   <div class="success-screen" id="success-screen" style="display:none">
     <div class="success-content">
       <div class="success-icon">🎉</div>
       <h2>Заказ принят!</h2>
-      <p>Ваш заказ уже готовится.<br>Ожидайте доставку ~40 минут.</p>
+      <p id="success-text">Ваш заказ уже готовится. Ожидайте ~40 минут!</p>
       <button class="back-btn" onclick="resetOrder()">Сделать новый заказ</button>
     </div>
   </div>
