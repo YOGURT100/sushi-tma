@@ -1,146 +1,115 @@
-# 🍣 Sushi House — Telegram Mini App
+# 🍣 Sushi House — Professional Telegram Mini App v3
 
-Полноценный бот для суши-ресторана с Mini App: меню, корзина, оформление заказов.
+Полноценная система: бот + Mini App + REST API + Веб-панель администратора.
 
 ---
 
-## 📁 Структура проекта
+## 📁 Структура
 
 ```
 sushi-tma/
-├── frontend/          ← Деплоится на Vercel
-│   ├── index.html
+├── frontend/               ← Vercel (статика)
+│   ├── index.html          Клиентский Mini App
 │   ├── style.css
-│   └── app.js
-└── bot/               ← Деплоится на Railway
-    ├── bot.py
+│   ├── app.js
+│   ├── admin.html          Панель администратора
+│   ├── admin.css
+│   └── admin.js
+└── bot/                    ← Railway (Python)
+    ├── bot.py              Бот + aiohttp REST API
     ├── requirements.txt
     ├── Procfile
-    └── .env.example
+    ├── runtime.txt
+    ├── .env.example
+    └── data/               (создаётся автоматически)
+        ├── menu.json
+        └── orders.json
 ```
 
 ---
 
-## 🚀 Деплой шаг за шагом
+## 🚀 Деплой
 
-### Шаг 1 — Создать бота в Telegram
-
-1. Открыть [@BotFather](https://t.me/BotFather)
-2. Написать `/newbot`
-3. Ввести название: `Sushi House`
-4. Ввести username: `sushihouse_mybot`
-5. **Скопировать TOKEN** — он понадобится дальше
-
----
-
-### Шаг 2 — Залить код на GitHub
-
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/YOGURT100/sushi-tma.git
-git push -u origin main
+### Шаг 1 — BotFather
+```
+/newbot → получить TOKEN
+/newapp → указать URL Vercel как Web App URL
 ```
 
----
+### Шаг 2 — Vercel (фронтенд)
+1. Vercel → New Project → импорт репо
+2. **Root Directory** → `frontend`
+3. Deploy → скопировать URL `https://xxx.vercel.app`
 
-### Шаг 3 — Деплой фронтенда на Vercel
-
-1. Зайти на [vercel.com](https://vercel.com) → Sign up (через GitHub)
-2. **New Project** → импортировать `sushi-tma`
-3. **Root Directory** → указать `frontend`
-4. Нажать **Deploy**
-5. Получить URL вида: `https://sushi-tma-xyz.vercel.app`
-
-> ✅ Теперь Mini App доступен по HTTPS — именно это нужно Telegram.
-
----
-
-### Шаг 4 — Деплой бота на Railway
-
-1. Зайти на [railway.app](https://railway.app) → Login with GitHub
-2. **New Project** → Deploy from GitHub → выбрать `sushi-tma`
-3. **Root Directory** → указать `bot`
-4. Перейти в **Variables** и добавить:
+### Шаг 3 — Railway (бот + API)
+1. Railway → New Project → Deploy from GitHub
+2. **Root Directory** → `bot`
+3. Variables:
    | Ключ | Значение |
-   |------|----------|
+   |---|---|
    | `BOT_TOKEN` | Токен из BotFather |
    | `WEB_APP_URL` | URL с Vercel |
-   | `ADMIN_ID` | Ваш Telegram ID (узнать: @userinfobot) |
-5. Railway сам запустит бота
+   | `ADMIN_ID` | Ваш Telegram ID |
+   | `PORT` | `8080` |
+   | `STARS_RATE` | `1.5` |
+4. Скопировать Railway URL вида `https://xxx.up.railway.app`
+
+### Шаг 4 — Подключить Admin-панель
+1. Напишите боту `/admin` — получите API-токен
+2. Откройте `https://xxx.vercel.app/admin.html`
+3. Введите Railway URL + токен → Подключиться
 
 ---
 
-### Шаг 5 — Привязать Mini App к боту
+## ✨ Функционал
 
-В [@BotFather](https://t.me/BotFather):
-```
-/newapp
-→ Выбрать вашего бота
-→ Название: Sushi House Menu
-→ Описание: Меню и корзина
-→ Web App URL: https://sushi-tma-xyz.vercel.app
-```
-
----
-
-## 🎉 Готово!
-
-Напишите боту `/start` — появится кнопка **«Открыть меню»**.
-
----
-
-## ✨ Функциональность
-
-### Mini App (frontend)
-- 22 позиции в 5 категориях: Роллы, Нигири, Сашими, Сеты, Напитки
-- Корзина с добавлением/удалением позиций
+### Mini App (клиент)
+- 22 позиции в 5 категориях
+- Корзина с event delegation (баг множественного добавления исправлен)
 - Промокоды: `SUSHI10`, `ROLL20`, `WELCOME15`
-- Бесплатная доставка от 1500 ₽
-- Адаптивный интерфейс (тёмная тема)
-- Haptic feedback при нажатиях
+- Оформление с адресом и выбором оплаты
+- Telegram Stars (нативный инвойс XTR)
+- Наличные / заглушки СБП и карты
+- Раздел «Адреса» с картой и телефоном
+- Toast-уведомления вместо alert()
+- Тема Telegram (авто-синхронизация)
 
-### Бот (backend)
-- Команды: `/start`, `/menu`, `/help`
+### Бот
+- `/start` — главное меню
+- `/admin` — токен + ссылка на панель (только для ADMIN_ID)
+- `/orders` — последние 10 заказов
 - Приём заказов из Mini App
-- Уведомления администратору с кнопками Принять/Отменить
-- Уведомление пользователя о статусе заказа
+- Stars: send_invoice с `provider_token=""` (исправлено)
+- Уведомления пользователю при каждом изменении статуса
+- Кнопки управления статусом прямо в Telegram
+
+### Цикл статусов
+```
+new → accepted → preparing → ready → delivered
+           ↘         ↘        ↘       ↘
+                        cancelled
+```
+При каждом переходе пользователь получает уведомление в бот.
+
+### Панель администратора
+- **Дашборд**: статистика за день/неделю, активные заказы
+- **Заказы**: фильтр по статусу, управление прямо из панели
+- **Меню**: добавление, редактирование, удаление, пауза
+- **Адреса**: список точек с картой
+- Авто-обновление каждые 30 сек
+- Адаптивный: боковое меню на ПК, нижняя навигация на мобильном
 
 ---
 
-## 🛠 Локальный тест
+## 🔧 Локальный запуск
 
 ```bash
 cd bot
 pip install -r requirements.txt
 cp .env.example .env
-# Заполни .env своими данными
+# Заполни .env
 python bot.py
 ```
 
-Фронтенд можно открыть прямо в браузере — `frontend/index.html`.
-Некоторые Telegram-функции работают только внутри Telegram.
-
----
-
-## 📝 Промокоды
-
-| Код | Скидка |
-|-----|--------|
-| `SUSHI10` | 10% |
-| `ROLL20` | 20% |
-| `WELCOME15` | 15% |
-
----
-
-## 🔧 Настройка меню
-
-Откройте `frontend/app.js` и найдите массив `MENU`.
-Добавьте, удалите или измените позиции по образцу:
-
-```js
-{ id: 23, cat: 'rolls', name: 'Мой ролл', desc: 'Описание', weight: '280 г · 8 шт', price: 650, emoji: '🍙' },
-```
-
-Категории: `rolls` · `nigiri` · `sashimi` · `sets` · `drinks`
+Фронтенд: открыть `frontend/index.html` в браузере.
+Admin-панель: `frontend/admin.html` (потребует Railway URL + токен).

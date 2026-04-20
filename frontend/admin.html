@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>Sushi House — Панель управления</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="admin.css"/>
+</head>
+<body>
+
+<!-- SETUP MODAL (первый запуск) -->
+<div class="modal-overlay" id="setup-modal">
+  <div class="modal">
+    <div class="modal-icon">🔑</div>
+    <h2>Настройка панели</h2>
+    <p>Введите API URL вашего бота (Railway) и токен из команды /admin</p>
+    <input class="m-input" id="setup-url"   type="text" placeholder="https://your-bot.up.railway.app"/>
+    <input class="m-input" id="setup-token" type="text" placeholder="API-токен (из /admin)"/>
+    <button class="m-btn" id="setup-save-btn">Подключиться</button>
+    <p class="m-hint" id="setup-err"></p>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="layout" id="app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <span>🍣</span>
+      <div>
+        <div class="sb-title">Sushi House</div>
+        <div class="sb-sub">Панель управления</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <button class="sb-link active" data-section="dashboard">
+        <span>📊</span> Дашборд
+      </button>
+      <button class="sb-link" data-section="orders">
+        <span>📋</span> Заказы
+        <span class="nav-badge" id="nav-badge-orders">0</span>
+      </button>
+      <button class="sb-link" data-section="menu">
+        <span>🍱</span> Меню
+      </button>
+      <button class="sb-link" data-section="locations">
+        <span>📍</span> Адреса
+      </button>
+    </nav>
+    <div class="sb-footer">
+      <button class="sb-settings-btn" id="sb-settings-btn">⚙️ Настройки</button>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content" id="content">
+
+    <!-- DASHBOARD -->
+    <section class="section" id="sec-dashboard">
+      <div class="sec-head">
+        <h1 class="sec-title">📊 Дашборд</h1>
+        <button class="refresh-btn" id="refresh-btn">↻ Обновить</button>
+      </div>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card loading"></div>
+        <div class="stat-card loading"></div>
+        <div class="stat-card loading"></div>
+        <div class="stat-card loading"></div>
+        <div class="stat-card loading"></div>
+        <div class="stat-card loading"></div>
+      </div>
+      <h2 class="sub-title">Активные заказы</h2>
+      <div id="active-orders-list"></div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="section" id="sec-orders" style="display:none">
+      <div class="sec-head">
+        <h1 class="sec-title">📋 Заказы</h1>
+        <button class="refresh-btn" id="orders-refresh-btn">↻</button>
+      </div>
+      <div class="filter-bar" id="orders-filter">
+        <button class="filter-btn active" data-status="all">Все</button>
+        <button class="filter-btn" data-status="new">🆕 Новые</button>
+        <button class="filter-btn" data-status="accepted">✅ Принятые</button>
+        <button class="filter-btn" data-status="preparing">👨‍🍳 Готовятся</button>
+        <button class="filter-btn" data-status="ready">📦 Готовы</button>
+        <button class="filter-btn" data-status="delivered">🚀 Доставлены</button>
+        <button class="filter-btn" data-status="cancelled">❌ Отменены</button>
+      </div>
+      <div id="orders-list"></div>
+    </section>
+
+    <!-- MENU MANAGER -->
+    <section class="section" id="sec-menu" style="display:none">
+      <div class="sec-head">
+        <h1 class="sec-title">🍱 Управление меню</h1>
+        <button class="add-item-btn" id="add-item-btn">+ Добавить позицию</button>
+      </div>
+      <div class="menu-filter-bar">
+        <button class="filter-btn active" data-mcat="all">Все</button>
+        <button class="filter-btn" data-mcat="rolls">Роллы</button>
+        <button class="filter-btn" data-mcat="nigiri">Нигири</button>
+        <button class="filter-btn" data-mcat="sashimi">Сашими</button>
+        <button class="filter-btn" data-mcat="sets">Сеты</button>
+        <button class="filter-btn" data-mcat="drinks">Напитки</button>
+      </div>
+      <div class="menu-admin-grid" id="menu-admin-grid"></div>
+    </section>
+
+    <!-- LOCATIONS -->
+    <section class="section" id="sec-locations" style="display:none">
+      <div class="sec-head">
+        <h1 class="sec-title">📍 Адреса точек</h1>
+      </div>
+      <div id="locations-list"></div>
+    </section>
+
+  </main>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="bn-btn active" data-section="dashboard">📊<span>Дашборд</span></button>
+    <button class="bn-btn" data-section="orders">
+      📋<span>Заказы</span>
+      <span class="bn-badge" id="bn-badge-orders">0</span>
+    </button>
+    <button class="bn-btn" data-section="menu">🍱<span>Меню</span></button>
+    <button class="bn-btn" data-section="locations">📍<span>Адреса</span></button>
+  </nav>
+</div>
+
+<!-- ITEM MODAL (add/edit) -->
+<div class="modal-overlay" id="item-modal" style="display:none">
+  <div class="modal modal--wide">
+    <div class="modal-head">
+      <h2 id="item-modal-title">Добавить позицию</h2>
+      <button class="modal-close" id="item-modal-close">✕</button>
+    </div>
+    <div class="m-form">
+      <input type="hidden" id="item-id"/>
+      <div class="m-row">
+        <label>Название *</label>
+        <input class="m-input" id="item-name" type="text" placeholder="Филадельфия классик"/>
+      </div>
+      <div class="m-row">
+        <label>Категория *</label>
+        <select class="m-input m-select" id="item-cat">
+          <option value="rolls">Роллы</option>
+          <option value="nigiri">Нигири</option>
+          <option value="sashimi">Сашими</option>
+          <option value="sets">Сеты</option>
+          <option value="drinks">Напитки</option>
+        </select>
+      </div>
+      <div class="m-row">
+        <label>Описание</label>
+        <textarea class="m-input m-textarea" id="item-desc" rows="2" placeholder="Лосось, сливочный сыр, авокадо"></textarea>
+      </div>
+      <div class="m-row2">
+        <div class="m-row">
+          <label>Цена (₽) *</label>
+          <input class="m-input" id="item-price" type="number" placeholder="690"/>
+        </div>
+        <div class="m-row">
+          <label>Вес / объём</label>
+          <input class="m-input" id="item-weight" type="text" placeholder="280 г · 8 шт"/>
+        </div>
+      </div>
+      <div class="m-row2">
+        <div class="m-row">
+          <label>Эмодзи</label>
+          <input class="m-input" id="item-emoji" type="text" placeholder="🍣" maxlength="4"/>
+        </div>
+        <div class="m-row">
+          <label>URL картинки</label>
+          <input class="m-input" id="item-image" type="url" placeholder="https://..."/>
+        </div>
+      </div>
+      <div class="m-err" id="item-err"></div>
+      <div class="m-actions">
+        <button class="m-btn m-btn--ghost" id="item-cancel-btn">Отмена</button>
+        <button class="m-btn" id="item-save-btn">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal" style="display:none">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <h2 id="confirm-title">Подтвердите действие</h2>
+    <p id="confirm-text">Вы уверены?</p>
+    <div class="m-actions">
+      <button class="m-btn m-btn--ghost" id="confirm-no">Отмена</button>
+      <button class="m-btn m-btn--danger" id="confirm-yes">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="a-toast" id="a-toast"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>
